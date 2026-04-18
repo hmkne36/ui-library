@@ -1,0 +1,165 @@
+local UI = {}
+UI.__index = UI
+
+function UI:CreateWindow(titleText)
+    local self = setmetatable({}, UI)
+
+    local ScreenGui = Instance.new("ScreenGui")
+    ScreenGui.Name = "UIFramework"
+    ScreenGui.Parent = game.CoreGui
+    ScreenGui.ResetOnSpawn = false
+    ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+
+    local BlurBG = Instance.new("ImageLabel", ScreenGui)
+    BlurBG.Size = UDim2.new(1,0,1,0)
+    BlurBG.Image = "rbxassetid://8992230677"
+    BlurBG.ImageTransparency = 0.85
+    BlurBG.BackgroundTransparency = 1
+    BlurBG.ZIndex = 0
+
+    local Main = Instance.new("Frame", ScreenGui)
+    Main.Size = UDim2.new(0, 260, 0, 330)
+    Main.Position = UDim2.new(0.05, 0, 0.3, 0)
+    Main.BackgroundColor3 = Color3.fromRGB(20,20,26)
+    Main.BorderSizePixel = 0
+    Main.Active = true
+    Main.Draggable = true
+    Main.ZIndex = 2
+    Instance.new("UICorner", Main).CornerRadius = UDim.new(0,16)
+
+    local Container = Instance.new("Frame", Main)
+    Container.Size = UDim2.new(1, -20, 0, 220)
+    Container.Position = UDim2.new(0, 10, 0, 60)
+    Container.BackgroundTransparency = 1
+    Container.ZIndex = 3
+
+    local Layout = Instance.new("UIListLayout", Container)
+    Layout.Padding = UDim.new(0,12)
+
+    local Title = Instance.new("TextLabel", Main)
+    Title.Size = UDim2.new(1,0,0,50)
+    Title.BackgroundTransparency = 1
+    Title.Text = titleText
+    Title.TextColor3 = Color3.fromRGB(255,255,255)
+    Title.TextSize = 20
+    Title.Font = Enum.Font.GothamBold
+
+    local minimized = false
+
+    local function tween(obj, props)
+        game:GetService("TweenService"):Create(obj, TweenInfo.new(0.25), props):Play()
+    end
+
+    local MinBtn = Instance.new("TextButton", Main)
+    MinBtn.Size = UDim2.new(0, 25, 0, 25)
+    MinBtn.Position = UDim2.new(1, -65, 0, 12)
+    MinBtn.Text = "⛶"
+    MinBtn.BackgroundTransparency = 1
+    MinBtn.TextColor3 = Color3.fromRGB(255,255,255)
+
+    MinBtn.MouseButton1Click:Connect(function()
+        minimized = not minimized
+        if minimized then
+            tween(Container, {Size = UDim2.new(1,-20,0,0)})
+            tween(Main, {Size = UDim2.new(0,260,0,70)})
+        else
+            tween(Container, {Size = UDim2.new(1,-20,0,220)})
+            tween(Main, {Size = UDim2.new(0,260,0,330)})
+        end
+    end)
+
+    local CloseBtn = Instance.new("TextButton", Main)
+    CloseBtn.Size = UDim2.new(0, 25, 0, 25)
+    CloseBtn.Position = UDim2.new(1, -35, 0, 12)
+    CloseBtn.Text = "❌"
+    CloseBtn.BackgroundTransparency = 1
+    CloseBtn.TextColor3 = Color3.fromRGB(255,255,255)
+
+    local Confirm = Instance.new("Frame", ScreenGui)
+    Confirm.Size = UDim2.new(0, 220, 0, 120)
+    Confirm.Position = UDim2.new(0.5,-110,0.5,-60)
+    Confirm.BackgroundColor3 = Color3.fromRGB(25,25,30)
+    Confirm.Visible = false
+    Instance.new("UICorner", Confirm).CornerRadius = UDim.new(0,12)
+
+    local Txt = Instance.new("TextLabel", Confirm)
+    Txt.Size = UDim2.new(1,0,0.6,0)
+    Txt.Text = "Are you sure you want to close this UI?"
+    Txt.TextWrapped = true
+    Txt.BackgroundTransparency = 1
+    Txt.TextColor3 = Color3.new(1,1,1)
+
+    local Yes = Instance.new("TextButton", Confirm)
+    Yes.Size = UDim2.new(0.4,0,0.25,0)
+    Yes.Position = UDim2.new(0.1,0,0.7,0)
+    Yes.Text = "Yes"
+
+    local No = Instance.new("TextButton", Confirm)
+    No.Size = UDim2.new(0.4,0,0.25,0)
+    No.Position = UDim2.new(0.5,0,0.7,0)
+    No.Text = "No"
+
+    CloseBtn.MouseButton1Click:Connect(function()
+        Confirm.Visible = true
+    end)
+
+    No.MouseButton1Click:Connect(function()
+        Confirm.Visible = false
+    end)
+
+    Yes.MouseButton1Click:Connect(function()
+        Confirm.Visible = false
+        tween(Main, {Size = UDim2.new(0,0,0,0)})
+        task.wait(0.25)
+        ScreenGui:Destroy()
+    end)
+
+    self.Container = Container
+    return self
+end
+
+function UI:CreateToggle(text, callback, isLoop)
+    local Frame = Instance.new("Frame", self.Container)
+    Frame.Size = UDim2.new(1, 0, 0, 44)
+    Frame.BackgroundColor3 = Color3.fromRGB(26,26,34)
+    Instance.new("UICorner", Frame).CornerRadius = UDim.new(0,12)
+
+    local Label = Instance.new("TextLabel", Frame)
+    Label.Text = text
+    Label.Size = UDim2.new(0.7,0,1,0)
+    Label.BackgroundTransparency = 1
+    Label.TextColor3 = Color3.new(1,1,1)
+
+    local Box = Instance.new("TextButton", Frame)
+    Box.Size = UDim2.new(0,40,0,22)
+    Box.Position = UDim2.new(0.75,0,0.5,-11)
+
+    local Circle = Instance.new("Frame", Box)
+    Circle.Size = UDim2.new(0,18,0,18)
+    Circle.Position = UDim2.new(0,2,0.5,-9)
+    Instance.new("UICorner", Circle)
+
+    local active = false
+
+    Box.MouseButton1Click:Connect(function()
+        active = not active
+        if active then
+            Circle:TweenPosition(UDim2.new(1,-20,0.5,-9),"Out","Quad",0.2,true)
+            if isLoop then
+                task.spawn(function()
+                    while active do
+                        callback(true)
+                        task.wait(0.1)
+                    end
+                end)
+            else
+                callback(true)
+            end
+        else
+            Circle:TweenPosition(UDim2.new(0,2,0.5,-9),"Out","Quad",0.2,true)
+            callback(false)
+        end
+    end)
+end
+
+return UI
