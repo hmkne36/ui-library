@@ -1,0 +1,136 @@
+local UI = {}
+UI.__index = UI
+
+function UI:CreateWindow(titleText)
+    local self = setmetatable({}, UI)
+
+    local ScreenGui = Instance.new("ScreenGui")
+    ScreenGui.Name = "UIFramework"
+    ScreenGui.Parent = game.CoreGui
+    ScreenGui.ResetOnSpawn = false
+
+    local Blur = Instance.new("BlurEffect")
+    Blur.Size = 12
+    Blur.Parent = game.Lighting
+
+    local Main = Instance.new("Frame", ScreenGui)
+    Main.Size = UDim2.new(0, 240, 0, 310)
+    Main.Position = UDim2.new(0.05, 0, 0.3, 0)
+    Main.BackgroundColor3 = Color3.fromRGB(18,18,22)
+    Main.BorderSizePixel = 0
+    Main.Active = true
+    Main.Draggable = true
+    Instance.new("UICorner", Main).CornerRadius = UDim.new(0,14)
+
+    local Shadow = Instance.new("Frame", Main)
+    Shadow.Size = UDim2.new(1, 20, 1, 20)
+    Shadow.Position = UDim2.new(0, -10, 0, -10)
+    Shadow.BackgroundColor3 = Color3.fromRGB(0,0,0)
+    Shadow.BackgroundTransparency = 0.7
+    Shadow.ZIndex = 0
+    Instance.new("UICorner", Shadow).CornerRadius = UDim.new(0,16)
+
+    local Gradient = Instance.new("UIGradient", Main)
+    Gradient.Color = ColorSequence.new{
+        ColorSequenceKeypoint.new(0, Color3.fromRGB(24,24,30)),
+        ColorSequenceKeypoint.new(1, Color3.fromRGB(16,16,20))
+    }
+
+    local Title = Instance.new("TextLabel", Main)
+    Title.Size = UDim2.new(1,0,0,45)
+    Title.BackgroundTransparency = 1
+    Title.Text = titleText
+    Title.TextColor3 = Color3.fromRGB(255,255,255)
+    Title.TextSize = 20
+    Title.Font = Enum.Font.GothamBold
+
+    local Footer = Instance.new("TextLabel", Main)
+    Footer.Position = UDim2.new(0, 0, 1, -35)
+    Footer.Size = UDim2.new(1, 0, 0, 25)
+    Footer.BackgroundTransparency = 1
+    Footer.Text = "by hmkkk"
+    Footer.TextColor3 = Color3.fromRGB(140,140,150)
+    Footer.TextSize = 14
+    Footer.Font = Enum.Font.Gotham
+
+    local Container = Instance.new("Frame", Main)
+    Container.Size = UDim2.new(1, -20, 0, 200)
+    Container.Position = UDim2.new(0, 10, 0, 55)
+    Container.BackgroundTransparency = 1
+
+    local Layout = Instance.new("UIListLayout", Container)
+    Layout.Padding = UDim.new(0,10)
+
+    self.Container = Container
+    return self
+end
+
+function UI:CreateToggle(text, callback, isLoop)
+    local Frame = Instance.new("Frame", self.Container)
+    Frame.Size = UDim2.new(1, 0, 0, 42)
+    Frame.BackgroundColor3 = Color3.fromRGB(24,24,30)
+    Frame.BorderSizePixel = 0
+    Instance.new("UICorner", Frame).CornerRadius = UDim.new(0,10)
+
+    local Stroke = Instance.new("UIStroke", Frame)
+    Stroke.Color = Color3.fromRGB(50,50,60)
+    Stroke.Thickness = 1
+
+    local Label = Instance.new("TextLabel", Frame)
+    Label.Text = text
+    Label.Size = UDim2.new(0.7, 0, 1, 0)
+    Label.TextColor3 = Color3.fromRGB(230,230,235)
+    Label.BackgroundTransparency = 1
+    Label.TextXAlignment = Enum.TextXAlignment.Left
+    Label.Font = Enum.Font.GothamBold
+    Label.TextSize = 15
+
+    local Box = Instance.new("TextButton", Frame)
+    Box.Size = UDim2.new(0, 38, 0, 22)
+    Box.Position = UDim2.new(0.75, 0, 0.5, -11)
+    Box.BackgroundColor3 = Color3.fromRGB(40,40,50)
+    Box.Text = ""
+    Box.AutoButtonColor = false
+    Instance.new("UICorner", Box).CornerRadius = UDim.new(1,0)
+
+    local Circle = Instance.new("Frame", Box)
+    Circle.Size = UDim2.new(0, 18, 0, 18)
+    Circle.Position = UDim2.new(0, 2, 0.5, -9)
+    Circle.BackgroundColor3 = Color3.fromRGB(255,255,255)
+    Circle.BorderSizePixel = 0
+    Instance.new("UICorner", Circle).CornerRadius = UDim.new(1,0)
+
+    local active = false
+    local thread = nil
+
+    Box.MouseButton1Click:Connect(function()
+        active = not active
+
+        if active then
+            Box.BackgroundColor3 = Color3.fromRGB(120,90,255)
+            Circle:TweenPosition(UDim2.new(1, -20, 0.5, -9), "Out", "Quad", 0.15, true)
+
+            if isLoop then
+                thread = task.spawn(function()
+                    while active do
+                        callback(true)
+                        task.wait(0.1)
+                    end
+                end)
+            else
+                callback(true)
+            end
+        else
+            Box.BackgroundColor3 = Color3.fromRGB(40,40,50)
+            Circle:TweenPosition(UDim2.new(0, 2, 0.5, -9), "Out", "Quad", 0.15, true)
+
+            if thread then
+                task.cancel(thread)
+            end
+
+            callback(false)
+        end
+    end)
+end
+
+return UI
