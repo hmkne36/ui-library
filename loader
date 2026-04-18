@@ -1,0 +1,2 @@
+print("Loaded AccuUI v1 \ by hmkkk !! | dsc.gg/accu or dsc.gg/vyntra")
+loadstring(game:HttpGet("https://raw.githubusercontent.com/hmkne36/ui-library/refs/heads/main/src/lib-v1"))()
