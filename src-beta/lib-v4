@@ -1,0 +1,175 @@
+local UI = {}
+UI.__index = UI
+
+function UI:CreateWindow(titleText)
+    local self = setmetatable({}, UI)
+
+    local ScreenGui = Instance.new("ScreenGui")
+    ScreenGui.Name = "UIFramework"
+    ScreenGui.Parent = game.CoreGui
+    ScreenGui.ResetOnSpawn = false
+    ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+
+    local BlurBG = Instance.new("ImageLabel", ScreenGui)
+    BlurBG.Size = UDim2.new(1,0,1,0)
+    BlurBG.Image = "rbxassetid://8992230677"
+    BlurBG.ImageTransparency = 0.85
+    BlurBG.BackgroundTransparency = 1
+    BlurBG.ZIndex = 0
+
+    local Main = Instance.new("Frame", ScreenGui)
+    Main.Size = UDim2.new(0, 260, 0, 330)
+    Main.Position = UDim2.new(0.05, 0, 0.3, 0)
+    Main.BackgroundColor3 = Color3.fromRGB(20,20,26)
+    Main.BorderSizePixel = 0
+    Main.Active = true
+    Main.Draggable = true
+    Main.ZIndex = 2
+    Instance.new("UICorner", Main).CornerRadius = UDim.new(0,16)
+
+    local Shadow = Instance.new("ImageLabel", Main)
+    Shadow.Size = UDim2.new(1, 50, 1, 50)
+    Shadow.Position = UDim2.new(0, -25, 0, -25)
+    Shadow.BackgroundTransparency = 1
+    Shadow.Image = "rbxassetid://1316045217"
+    Shadow.ImageTransparency = 0.85
+    Shadow.ScaleType = Enum.ScaleType.Slice
+    Shadow.SliceCenter = Rect.new(10,10,118,118)
+    Shadow.ZIndex = 1
+
+    local Glow = Instance.new("UIStroke", Main)
+    Glow.Color = Color3.fromRGB(120,90,255)
+    Glow.Thickness = 1.2
+    Glow.Transparency = 0.6
+
+    local Gradient = Instance.new("UIGradient", Main)
+    Gradient.Color = ColorSequence.new{
+        ColorSequenceKeypoint.new(0, Color3.fromRGB(30,30,40)),
+        ColorSequenceKeypoint.new(1, Color3.fromRGB(15,15,20))
+    }
+
+    local Title = Instance.new("TextLabel", Main)
+    Title.Size = UDim2.new(1,0,0,50)
+    Title.BackgroundTransparency = 1
+    Title.Text = titleText
+    Title.TextColor3 = Color3.fromRGB(255,255,255)
+    Title.TextSize = 20
+    Title.Font = Enum.Font.GothamBold
+    Title.ZIndex = 3
+
+    local AccentLine = Instance.new("Frame", Main)
+    AccentLine.Size = UDim2.new(0.6,0,0,2)
+    AccentLine.Position = UDim2.new(0.2,0,0,48)
+    AccentLine.BackgroundColor3 = Color3.fromRGB(120,90,255)
+    AccentLine.BorderSizePixel = 0
+    AccentLine.ZIndex = 3
+    Instance.new("UICorner", AccentLine).CornerRadius = UDim.new(1,0)
+
+    local Footer = Instance.new("TextLabel", Main)
+    Footer.Position = UDim2.new(0, 0, 1, -30)
+    Footer.Size = UDim2.new(1, 0, 0, 25)
+    Footer.BackgroundTransparency = 1
+    Footer.Text = "hmkkk ui"
+    Footer.TextColor3 = Color3.fromRGB(150,150,170)
+    Footer.TextSize = 13
+    Footer.Font = Enum.Font.Gotham
+    Footer.ZIndex = 3
+
+    local Container = Instance.new("Frame", Main)
+    Container.Size = UDim2.new(1, -20, 0, 220)
+    Container.Position = UDim2.new(0, 10, 0, 60)
+    Container.BackgroundTransparency = 1
+    Container.ZIndex = 3
+
+    local Layout = Instance.new("UIListLayout", Container)
+    Layout.Padding = UDim.new(0,12)
+    Layout.SortOrder = Enum.SortOrder.LayoutOrder
+
+    self.Container = Container
+    return self
+end
+
+function UI:CreateToggle(text, callback, isLoop)
+    local Frame = Instance.new("Frame", self.Container)
+    Frame.Size = UDim2.new(1, 0, 0, 44)
+    Frame.BackgroundColor3 = Color3.fromRGB(26,26,34)
+    Frame.BorderSizePixel = 0
+    Frame.ZIndex = 3
+    Instance.new("UICorner", Frame).CornerRadius = UDim.new(0,12)
+
+    local Stroke = Instance.new("UIStroke", Frame)
+    Stroke.Color = Color3.fromRGB(60,60,80)
+    Stroke.Thickness = 1
+    Stroke.Transparency = 0.4
+
+    local Label = Instance.new("TextLabel", Frame)
+    Label.Text = text
+    Label.Size = UDim2.new(0.7, 0, 1, 0)
+    Label.TextColor3 = Color3.fromRGB(230,230,240)
+    Label.BackgroundTransparency = 1
+    Label.TextXAlignment = Enum.TextXAlignment.Left
+    Label.Font = Enum.Font.GothamBold
+    Label.TextSize = 15
+    Label.ZIndex = 4
+
+    local Box = Instance.new("TextButton", Frame)
+    Box.Size = UDim2.new(0, 40, 0, 22)
+    Box.Position = UDim2.new(0.75, 0, 0.5, -11)
+    Box.BackgroundColor3 = Color3.fromRGB(45,45,60)
+    Box.Text = ""
+    Box.AutoButtonColor = false
+    Box.ZIndex = 4
+    Instance.new("UICorner", Box).CornerRadius = UDim.new(1,0)
+
+    local BoxStroke = Instance.new("UIStroke", Box)
+    BoxStroke.Color = Color3.fromRGB(80,80,110)
+    BoxStroke.Thickness = 1
+    BoxStroke.Transparency = 0.5
+
+    local Circle = Instance.new("Frame", Box)
+    Circle.Size = UDim2.new(0, 18, 0, 18)
+    Circle.Position = UDim2.new(0, 2, 0.5, -9)
+    Circle.BackgroundColor3 = Color3.fromRGB(255,255,255)
+    Circle.BorderSizePixel = 0
+    Circle.ZIndex = 5
+    Instance.new("UICorner", Circle).CornerRadius = UDim.new(1,0)
+
+    local Glow = Instance.new("UIStroke", Circle)
+    Glow.Color = Color3.fromRGB(120,90,255)
+    Glow.Thickness = 2
+    Glow.Transparency = 0.6
+
+    local active = false
+    local thread = nil
+
+    Box.MouseButton1Click:Connect(function()
+        active = not active
+
+        if active then
+            Box.BackgroundColor3 = Color3.fromRGB(120,90,255)
+            Circle:TweenPosition(UDim2.new(1, -20, 0.5, -9), "Out", "Quad", 0.2, true)
+
+            if isLoop then
+                thread = task.spawn(function()
+                    while active do
+                        callback(true)
+                        task.wait(0.1)
+                    end
+                end)
+            else
+                callback(true)
+            end
+        else
+            Box.BackgroundColor3 = Color3.fromRGB(45,45,60)
+            Circle:TweenPosition(UDim2.new(0, 2, 0.5, -9), "Out", "Quad", 0.2, true)
+
+            if thread then
+                task.cancel(thread)
+            end
+
+            callback(false)
+        end
+    end)
+end
+
+return UI
