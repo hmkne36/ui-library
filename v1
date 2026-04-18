@@ -1,0 +1,167 @@
+local UI = {}
+UI.__index = UI
+
+print("dsc.gg/vyntra \ made by hmkkk. thanks for use")
+
+function UI:CreateWindow(titleText)
+    local self = setmetatable({}, UI)
+
+    local ScreenGui = Instance.new("ScreenGui")
+    ScreenGui.Name = "UIFramework"
+    ScreenGui.Parent = game.CoreGui
+    ScreenGui.ResetOnSpawn = false
+
+    local Main = Instance.new("Frame", ScreenGui)
+    Main.Size = UDim2.new(0, 260, 0, 350)
+    Main.Position = UDim2.new(0.05, 0, 0.3, 0)
+    Main.BackgroundColor3 = Color3.fromRGB(20,20,25)
+    Main.Active = true
+    Main.Draggable = true
+    Instance.new("UICorner", Main).CornerRadius = UDim.new(0,12)
+
+    local Title = Instance.new("TextLabel", Main)
+    Title.Size = UDim2.new(1,0,0,45)
+    Title.BackgroundTransparency = 1
+    Title.Text = titleText
+    Title.TextColor3 = Color3.new(1,1,1)
+    Title.Font = Enum.Font.GothamBold
+    Title.TextSize = 22
+
+    local Container = Instance.new("Frame", Main)
+    Container.Size = UDim2.new(1,-20,1,-60)
+    Container.Position = UDim2.new(0,10,0,50)
+    Container.BackgroundTransparency = 1
+
+    local Layout = Instance.new("UIListLayout", Container)
+    Layout.Padding = UDim.new(0,10)
+
+    self.Container = Container
+    return self
+end
+
+function UI:CreateButton(text, callback)
+    local Btn = Instance.new("TextButton", self.Container)
+    Btn.Size = UDim2.new(1,0,0,40)
+    Btn.BackgroundColor3 = Color3.fromRGB(30,30,35)
+    Btn.Text = text
+    Btn.TextColor3 = Color3.new(1,1,1)
+    Btn.Font = Enum.Font.GothamBold
+    Instance.new("UICorner", Btn)
+
+    Btn.MouseButton1Click:Connect(callback)
+end
+
+-- TOGGLE
+function UI:CreateToggle(text, callback)
+    local Frame = Instance.new("Frame", self.Container)
+    Frame.Size = UDim2.new(1,0,0,40)
+    Frame.BackgroundColor3 = Color3.fromRGB(25,25,30)
+    Instance.new("UICorner", Frame)
+
+    local Label = Instance.new("TextLabel", Frame)
+    Label.Size = UDim2.new(0.7,0,1,0)
+    Label.BackgroundTransparency = 1
+    Label.Text = text
+    Label.TextColor3 = Color3.new(1,1,1)
+    Label.Font = Enum.Font.GothamBold
+
+    local Btn = Instance.new("TextButton", Frame)
+    Btn.Size = UDim2.new(0,40,0,20)
+    Btn.Position = UDim2.new(0.75,0,0.5,-10)
+    Btn.BackgroundColor3 = Color3.fromRGB(60,0,0)
+    Btn.Text = ""
+    Instance.new("UICorner", Btn)
+
+    local state = false
+
+    Btn.MouseButton1Click:Connect(function()
+        state = not state
+        Btn.BackgroundColor3 = state and Color3.fromRGB(0,170,0) or Color3.fromRGB(60,0,0)
+        callback(state)
+    end)
+end
+
+function UI:CreateSlider(text, min, max, callback)
+    local Frame = Instance.new("Frame", self.Container)
+    Frame.Size = UDim2.new(1,0,0,50)
+    Frame.BackgroundColor3 = Color3.fromRGB(25,25,30)
+    Instance.new("UICorner", Frame)
+
+    local Label = Instance.new("TextLabel", Frame)
+    Label.Size = UDim2.new(1,0,0,20)
+    Label.BackgroundTransparency = 1
+    Label.Text = text .. ": " .. min
+    Label.TextColor3 = Color3.new(1,1,1)
+    Label.Font = Enum.Font.Gotham
+
+    local Bar = Instance.new("Frame", Frame)
+    Bar.Size = UDim2.new(1,-20,0,6)
+    Bar.Position = UDim2.new(0,10,0,30)
+    Bar.BackgroundColor3 = Color3.fromRGB(50,50,50)
+    Instance.new("UICorner", Bar)
+
+    local Fill = Instance.new("Frame", Bar)
+    Fill.Size = UDim2.new(0,0,1,0)
+    Fill.BackgroundColor3 = Color3.fromRGB(0,170,255)
+    Instance.new("UICorner", Fill)
+
+    local dragging = false
+
+    Bar.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 then
+            dragging = true
+        end
+    end)
+
+    Bar.InputEnded:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 then
+            dragging = false
+        end
+    end)
+
+    game:GetService("UserInputService").InputChanged:Connect(function(input)
+        if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
+            local percent = math.clamp((input.Position.X - Bar.AbsolutePosition.X)/Bar.AbsoluteSize.X, 0, 1)
+            Fill.Size = UDim2.new(percent,0,1,0)
+            local value = math.floor(min + (max-min)*percent)
+            Label.Text = text .. ": " .. value
+            callback(value)
+        end
+    end)
+end
+
+function UI:CreateDropdown(text, options, callback)
+    local Frame = Instance.new("Frame", self.Container)
+    Frame.Size = UDim2.new(1,0,0,40)
+    Frame.BackgroundColor3 = Color3.fromRGB(25,25,30)
+    Instance.new("UICorner", Frame)
+
+    local Btn = Instance.new("TextButton", Frame)
+    Btn.Size = UDim2.new(1,0,1,0)
+    Btn.BackgroundTransparency = 1
+    Btn.Text = text
+    Btn.TextColor3 = Color3.new(1,1,1)
+
+    local Open = false
+
+    Btn.MouseButton1Click:Connect(function()
+        Open = not Open
+
+        if Open then
+            for _,opt in pairs(options) do
+                local OptBtn = Instance.new("TextButton", self.Container)
+                OptBtn.Size = UDim2.new(1,0,0,35)
+                OptBtn.Text = opt
+                OptBtn.BackgroundColor3 = Color3.fromRGB(35,35,40)
+                Instance.new("UICorner", OptBtn)
+
+                OptBtn.MouseButton1Click:Connect(function()
+                    Btn.Text = text .. ": " .. opt
+                    callback(opt)
+                end)
+            end
+        end
+    end)
+end
+
+return UI
